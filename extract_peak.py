@@ -1,7 +1,7 @@
 from pathlib import Path
 import argparse
 
-from peak_extract.controller import run_app
+from extract_peak.controller import run_app
 
 # Constants
 DATA_ROOT = Path("/project/ag-nickel/Strahlzeiten/DESY_P62_June_2025/raw/")
