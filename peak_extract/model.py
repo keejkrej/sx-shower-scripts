@@ -75,8 +75,8 @@ class ImageSeriesModel:
         # Visual defaults (can be tweaked by the controller/view)
         self.vmin: int = 0
         self.vmax: int = 500
-        self.xrange: list[int] = [1450, 1750]
-        self.yrange: list[int] = [2000, 1700]
+        self.xrange: list[int] = [1400, 1700]
+        self.yrange: list[int] = [2100, 1800]
 
         # Peak storage – *peaks[frame]* ⇒ list[Peak]
         self.peaks: DefaultDict[str, List[Peak]] = defaultdict(list)
