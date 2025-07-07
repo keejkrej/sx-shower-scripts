@@ -86,7 +86,10 @@ class ImageSeriesModel:
     #Public Methods - Image Processing
     def current_image(self) -> np.ndarray:
         """Return a *sanitised* image for *frame_current* as ``np.ndarray``."""
-        img = self._img_series.get_frame(self.frame_current).data.astype(np.int32)
+        frame_data = self._img_series.get_frame(self.frame_current).data
+        if frame_data is None:
+            raise ValueError("Frame data is None")
+        img = frame_data.astype(np.int32)
         # Basic clean-up (domain-specific)
         img = img.copy()
         img[img > 10000] = 0
