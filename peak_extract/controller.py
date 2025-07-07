@@ -7,7 +7,6 @@ updates the *Model*, and refreshes the *View* accordingly.
 
 import sys
 from pathlib import Path
-from typing import Tuple
 
 from PyQt5.QtWidgets import QApplication
 
@@ -21,17 +20,19 @@ class ViewerController:  # noqa: D401 – orchestrator class
     """Glue-class connecting *ImageSeriesModel* and *Viewer*."""
 
     #Initialization
-    def __init__(self, file_data: str | Path, file_result: str | Path):
+    def __init__(self, file_data: Path, file_result: Path, 
+                 xrange: list[int] = [1400, 1700], yrange: list[int] = [2100, 1800],
+                 vmin: int = 0, vmax: int = 500):
         # Initialise model & view
         self._model = ImageSeriesModel(file_data, file_result)
         self._view = Viewer(
             frame_first=self._model.frame_first,
             frame_last=self._model.frame_last,
             frame_current=self._model.frame_current,
-            vmin=self._model.vmin,
-            vmax=self._model.vmax,
-            xrange=self._model.xrange,
-            yrange=self._model.yrange,
+            vmin=vmin,
+            vmax=vmax,
+            xrange=xrange,
+            yrange=yrange
         )
 
         # Connect signals
@@ -83,15 +84,25 @@ class ViewerController:  # noqa: D401 – orchestrator class
     def _refresh_view(self, *, full: bool = True):
         img = self._model.current_image()
         self._view.set_image(img)
-        coords: list[Tuple[int, int]] = [p.coordinate() for p in self._model.peaks_for_current_frame()]
+        coords: list[tuple[int, int]] = [p.coordinate for p in self._model.peaks_for_current_frame()]
         self._view.set_markers(coords)
         self._view.set_info(self._model.frame_current, self._model.total_peak_count())
         if full:
             self._view.set_slider_position(self._model.frame_current)
 
 
-def run_app(file_data: str | Path, file_result: str | Path):
+def run_app(file_data: Path, file_result: Path, xrange: list[int], yrange: list[int], vmin: int = 0, vmax: int = 500):
+    """Run the peak extraction application with visualization parameters.
+    
+    Args:
+        file_data: Path to input data file
+        file_result: Path to save results
+        xrange: X-axis display range
+        yrange: Y-axis display range
+        vmin: Minimum display intensity (default 0)
+        vmax: Maximum display intensity (default 500)
+    """
     app = QApplication.instance() or QApplication(sys.argv)
-    ctrl = ViewerController(file_data, file_result)
+    ctrl = ViewerController(file_data, file_result, xrange, yrange, vmin, vmax)
     ctrl.widget.show()
     sys.exit(app.exec_()) 

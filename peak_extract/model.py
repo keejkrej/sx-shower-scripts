@@ -8,7 +8,6 @@ manages domain data and business logic.
 import dill
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Tuple, DefaultDict
 
 import fabio
 import numpy as np
@@ -19,7 +18,7 @@ __all__ = [
 ]
 
 
-class Peak:  # noqa: D401 – simple representation class
+class Peak:
     """Container for a single diffraction peak."""
 
     #Initialization
@@ -32,19 +31,16 @@ class Peak:  # noqa: D401 – simple representation class
         yield from (self.x, self.y)
 
     def __repr__(self) -> str:  # pragma: no cover – purely cosmetic
-        return f"Peak(I={self.intensity()}, (x, y)=({self.x}, {self.y}))"
+        return f"Peak(I={self.intensity}, (x, y)=({self.x}, {self.y}))"
 
-    #Private Methods
-    def _intensity_helper(self) -> int:
+    #Public Methods
+    @property
+    def intensity(self) -> int:
         """Maximum intensity value within *data*."""
         return int(np.max(self.data))
 
-    #Public Methods
-    def intensity(self) -> int:
-        """Maximum intensity value within *data*."""
-        return self._intensity_helper()
-
-    def coordinate(self) -> Tuple[int, int]:
+    @property
+    def coordinate(self) -> tuple[int, int]:
         """Return the absolute image coordinate (x, y) of the peak centre."""
         return self.x, self.y
 
@@ -72,14 +68,8 @@ class ImageSeriesModel:
         self.frame_current: int = 0
         self.frame_step: int = 20
 
-        # Visual defaults (can be tweaked by the controller/view)
-        self.vmin: int = 0
-        self.vmax: int = 500
-        self.xrange: list[int] = [1400, 1700]
-        self.yrange: list[int] = [2100, 1800]
-
         # Peak storage – *peaks[frame]* ⇒ list[Peak]
-        self.peaks: DefaultDict[str, List[Peak]] = defaultdict(list)
+        self.peaks: defaultdict[str, list[Peak]] = defaultdict(list)
 
     #Public Methods - Frame Navigation
     def set_current_frame(self, idx: int) -> None:
@@ -150,5 +140,5 @@ class ImageSeriesModel:
     def total_peak_count(self) -> int:
         return sum(map(len, self.peaks.values()))
 
-    def peaks_for_current_frame(self) -> List[Peak]:
+    def peaks_for_current_frame(self) -> list[Peak]:
         return self.peaks[str(self.frame_current)]

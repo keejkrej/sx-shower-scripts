@@ -7,8 +7,6 @@ appropriately. The widget itself knows NOTHING about how to handle data – it
 just forwards events and waits for methods to be called to update its visuals.
 """
 
-from typing import List, Tuple
-
 import numpy as np
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (
@@ -55,8 +53,8 @@ class Viewer(QWidget):  # noqa: D401 – widget class
         frame_current: int,
         vmin: int,
         vmax: int,
-        xrange: List[int],
-        yrange: List[int],
+        xrange: list[int],
+        yrange: list[int],
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
@@ -165,7 +163,7 @@ class Viewer(QWidget):  # noqa: D401 – widget class
         self._im.set_extent((0, img.shape[1], img.shape[0], 0))
         self._canvas.draw()
 
-    def set_markers(self, coordinates: List[Tuple[int, int]]):
+    def set_markers(self, coordinates: list[tuple[int, int]]):
         # Remove old markers first
         for artist in getattr(self, "_markers", []):
             artist.remove()
@@ -184,7 +182,7 @@ class Viewer(QWidget):  # noqa: D401 – widget class
         self._slider.setValue(frame_idx)
         self._slider.blockSignals(False)
 
-    def set_axis_limits(self, xrange: List[int], yrange: List[int]):
+    def set_axis_limits(self, xrange: list[int], yrange: list[int]):
         self._xrange = xrange
         self._yrange = yrange
         self._update_axis_limits()

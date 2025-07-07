@@ -1,4 +1,5 @@
 from pathlib import Path
+import argparse
 
 from peak_extract.controller import run_app
 
@@ -12,4 +13,10 @@ FOLDER_RESULT = SAVE_ROOT / EXPERIMENT
 FILE_RESULT = FOLDER_RESULT / f"peaks_{EXPERIMENT}.dill"
 
 if __name__ == "__main__":
-    run_app(FILE_DATA, FILE_RESULT) 
+    parser = argparse.ArgumentParser(description="Run the peak extraction app with visualization parameters.")
+    parser.add_argument("--xrange", nargs=2, type=int, default=[1400, 1700], help="X-axis range for display.")
+    parser.add_argument("--yrange", nargs=2, type=int, default=[2100, 1800], help="Y-axis range for display.")
+    parser.add_argument("--vmin", type=int, default=0, help="Minimum display intensity.")
+    parser.add_argument("--vmax", type=int, default=500, help="Maximum display intensity.")
+    args = parser.parse_args()
+    run_app(FILE_DATA, FILE_RESULT, args.xrange, args.yrange, args.vmin, args.vmax) 
