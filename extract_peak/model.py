@@ -135,7 +135,6 @@ class ImageSeriesModel:
     #Public Methods - Persistence
     def save_peaks(self) -> None:
         """Dump *peaks* to the *file_result* path using ``dill``."""
-        self._file_result.parent.mkdir(parents=True, exist_ok=True)
         with self._file_result.open("wb") as f:
             dill.dump(self.peaks, f)
 

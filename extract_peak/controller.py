@@ -10,8 +10,8 @@ from pathlib import Path
 
 from PyQt5.QtWidgets import QApplication
 
-from .model import ImageSeriesModel
-from .view import Viewer
+from model import ImageSeriesModel
+from view import Viewer
 
 __all__ = ["ViewerController", "run_app"]
 

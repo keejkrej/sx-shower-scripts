@@ -1,68 +1,62 @@
-import os
-import numpy as np
 import fabio
 from pathlib import Path
 import matplotlib.pyplot as plt
 import pyFAI
-import argparse
+from plot_style import apply_style
 
-# Constants (aligned with app.py)
-DATA_ROOT = Path("/project/ag-nickel/Strahlzeiten/DESY_P62_June_2025/raw/")
-EXPERIMENT = "X3_shower1"
-FOLDER_DATA = DATA_ROOT / EXPERIMENT / "saxs"
-FILE_DATA = FOLDER_DATA / f"{EXPERIMENT}_00001_master.h5"  # Using same file as app.py
-SAVE_ROOT = Path("/home/t/Tianyi.Cao/scratch/shower/")
-FOLDER_RESULT = SAVE_ROOT / EXPERIMENT
+apply_style()
 
-# Parse arguments
-parser = argparse.ArgumentParser(description="Plot powder diffraction pattern with 1D and 2D integration.")
-parser.add_argument("--xrange", nargs=2, type=int, default=[1350, 1950], help="X-axis range for display.")
-parser.add_argument("--yrange", nargs=2, type=int, default=[2850, 2250], help="Y-axis range for display.")
-parser.add_argument("--vmin", type=int, default=0, help="Minimum display intensity.")
-parser.add_argument("--vmax", type=int, default=5000, help="Maximum display intensity.")
-parser.add_argument("--qmax", type=float, default=0.025, help="Maximum q value for plots.")
-args = parser.parse_args()
+# Constants
+INPUT_DIR = "powder_cubic_normal"
+CALIB_DIR = "agbh_jun_2024"
+OUTPUT_DIR = "plot"
+FILE_NAME = "Diamond_normal_SiO2_z126_5_master.h5"
+
+input_path = Path(INPUT_DIR).resolve() / FILE_NAME
+calib_path = Path(CALIB_DIR).resolve() / "calib.poni"
+mask_path = Path(CALIB_DIR).resolve() / "mask.edf"
+output_path = Path(OUTPUT_DIR).resolve()
+output_path.mkdir(parents=True, exist_ok=True)
 
 # Load data
-img = fabio.open(FILE_DATA).data.astype(np.int32).astype(np.float32)
-ai = pyFAI.load(FOLDER_RESULT / "peaks_X3_shower1.dill")  # Using calibration from peaks file
-mask = img < 0
+img = fabio.open(input_path).data
+ai = pyFAI.load(str(calib_path))
+mask = fabio.open(mask_path).data.astype(bool)
+img[mask] = 0
 
 # Perform integrations
-q_1d, i_1d = ai.integrate1d(img, 5000, unit='q_A^-1', mask=mask)
-i_2d, q_2d, phi_2d = ai.integrate2d(img, 5000, 720, unit='q_A^-1', mask=mask)
+q_1d, i_1d = ai.integrate1d(img, 200, unit='q_A^-1', mask=mask, radial_range=[0, 0.025])
+i_2d, q_2d, phi_2d = ai.integrate2d(img, 200, 180, unit='q_A^-1', mask=mask, radial_range=[0, 0.025])
 
 # Create figure
-fig, ax = plt.subplots(1, 3, figsize=(15, 6))
-fig.subplots_adjust(left=0.1, right=0.9, top=0.8, bottom=0.1, wspace=0.5)
+fig, axes = plt.subplots(1, 3, figsize=(10, 4))
 
 # Panel 1: Original image
-ax[0].imshow(img, cmap='hot', vmin=args.vmin, vmax=args.vmax)
-ax[0].set_xlim(*args.xrange)
-ax[0].set_ylim(*args.yrange)
-ax[0].set_xlabel('x (px)', weight='bold')
-ax[0].set_ylabel('y (px)', weight='bold')
+axes[0].imshow(img, cmap='hot', vmin=0, vmax=5000)
+axes[0].set_xlim(1200, 2000)
+axes[0].set_ylim(2200, 1400)
+axes[0].set_title('a) Original image')
+axes[0].axis('off')
 
 # Panel 2: 2D integration
-ax[1].imshow(i_2d, cmap='hot', vmin=args.vmin, vmax=args.vmax, aspect='auto',
+axes[1].imshow(i_2d, cmap='hot', vmin=0, vmax=5000, aspect='auto',
              extent=[min(q_2d), max(q_2d), min(phi_2d), max(phi_2d)])
-ax[1].set_xlim(0, args.qmax)
-ax[1].set_ylim(-180, 180)
-ax[1].set_xlabel('q (A^-1)', weight='bold')
-ax[1].set_ylabel('phi (deg)', weight='bold')
+axes[1].set_xlim(0, 0.025)
+axes[1].set_ylim(-180, 180)
+axes[1].set_xlabel('q [A$^{-1}$]')
+axes[1].set_ylabel(r'$\chi$ [deg]')
+axes[1].set_title('b) 2D integration')
 
-# Panel 3: 1D integration (log scale)
-ax[2].plot(q_1d, i_1d, color='black')
-ax[2].set_xlim(0, args.qmax)
-ax[2].set_ylim(1e1, 1e4)
-ax[2].set_yscale('log')
-ax[2].set_xlabel('q (A^-1)', weight='bold')
-ax[2].set_ylabel('Intensity (a.u.)', weight='bold')
+# Panel 3: 1D integration
+axes[2].plot(q_1d, i_1d)
+axes[2].set_xlim(0, 0.025)
+axes[2].set_ylim(1e1, 1e4)
+axes[2].set_yscale('log')
+axes[2].set_xlabel('q [A$^{-1}$]')
+axes[2].set_ylabel('Intensity [a.u.]')
+axes[2].set_title('c) 1D integration')
 
-# Titles
-ax[0].set_title('ring width:\n14 px = 1050 um', weight='bold')
-ax[1].set_title('ring width:\n0.0087 nm^-1 = 2pi / (720 nm)', weight='bold')
-fig.suptitle('SAXS of DNA diamond powder', weight='bold', fontsize=16)
-
-plt.savefig(FOLDER_RESULT / 'powder_diffraction.png', dpi=300)
-plt.show() 
+plt.suptitle(f"Ring width: 0.001 [1/A]")
+plt.tight_layout()
+plt.savefig(output_path / 'powder.pdf')
+plt.close(fig) 
