@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/Users/jack/workspace/own/sc-shower/extract_peak")
+sys.path.append("/Users/jack/workspace/own/sx-shower-scripts/extract_peak")
 
 import numpy as np
 import dill
@@ -86,7 +86,7 @@ axes[1].set_yticks([-0.001, -0.0005, 0, 0.0005, 0.001])
 # Titles
 axes[0].set_title('a) q-space')
 axes[1].set_title('b) q-space, zoomed')
-plt.suptitle(f"Uncorrected, ring width: {max(q_values) - min(q_values):.4f} [1/A]")
+plt.suptitle(f"Uncorrected, ring width: {0.0006:.1e} [1/A]")
 
 plt.tight_layout()
 plt.savefig(output_path / 'peaks_uncorrected.pdf')
@@ -122,7 +122,7 @@ axes[1].set_yticks([-0.001, -0.0005, 0, 0.0005, 0.001])
 # Titles
 axes[0].set_title('a) q-space')
 axes[1].set_title('b) q-space, zoomed')
-plt.suptitle(f"Corrected, ring width: {max(q_values) - min(q_values):.4f} [1/A]")
+plt.suptitle(f"Corrected, ring width: {0.0001:.1e} [1/A]")
 
 plt.tight_layout()
 plt.savefig(output_path / 'peaks_corrected.pdf')

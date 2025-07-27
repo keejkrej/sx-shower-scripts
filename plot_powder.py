@@ -56,7 +56,7 @@ axes[2].set_xlabel('q [A$^{-1}$]')
 axes[2].set_ylabel('Intensity [a.u.]')
 axes[2].set_title('c) 1D integration')
 
-plt.suptitle(f"Ring width: 0.001 [1/A]")
+plt.suptitle(f"Ring width: {0.001:.1e} [1/A]")
 plt.tight_layout()
 plt.savefig(output_path / 'powder.pdf')
 plt.close(fig) 

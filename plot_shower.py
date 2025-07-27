@@ -73,7 +73,7 @@ axes[2].plot(*line_2, color='white', linewidth=1)
 axes[2].plot(*line_3, color='white', linewidth=1)
 axes[2].plot(*line_4, color='white', linewidth=1)
 
-plt.suptitle(f"Peak width: 0.0003 [1/A]")
+plt.suptitle(f"Peak width: {0.0003:.1e} [1/A]")
 plt.tight_layout()
 plt.savefig(output_path / 'shower.pdf')
 plt.close(fig)
