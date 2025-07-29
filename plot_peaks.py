@@ -68,6 +68,11 @@ for i in range(0, len(peaks_coordinate), 2):
     plot_peaks(axes[1], point_1, point_2, colors[(i//2) % len(colors)], correct=False)
     q_values.extend([q1, q2])
 
+circle_out = plt.Circle((0, 0), max(q_values), edgecolor='red', facecolor='none', lw=1, linestyle='-.')
+circle_in = plt.Circle((0, 0), min(q_values), edgecolor='blue', facecolor='none', lw=1, linestyle='-.')
+axes[0].add_artist(circle_out)
+axes[0].add_artist(circle_in)
+
 axes[0].set_xlabel(r'q$_{\mathrm{x}}$ [A$^{-1}$]')
 axes[0].set_ylabel(r'q$_{\mathrm{y}}$ [A$^{-1}$]')
 axes[1].set_xlabel(r'q$_{\mathrm{x}}$ [A$^{-1}$]')
@@ -103,6 +108,11 @@ for i in range(0, len(peaks_coordinate), 2):
     q1, q2 = plot_peaks(axes[0], point_1, point_2, colors[(i//2) % len(colors)], correct=True)
     plot_peaks(axes[1], point_1, point_2, colors[(i//2) % len(colors)], correct=True)
     q_values.extend([q1, q2])
+
+circle_out = plt.Circle((0, 0), max(q_values), edgecolor='red', facecolor='none', lw=1, linestyle='-.')
+circle_in = plt.Circle((0, 0), min(q_values), edgecolor='blue', facecolor='none', lw=1, linestyle='-.')
+axes[0].add_artist(circle_out)
+axes[0].add_artist(circle_in)
 
 axes[0].set_xlabel(r'q$_{\mathrm{x}}$ [A$^{-1}$]')
 axes[0].set_ylabel(r'q$_{\mathrm{y}}$ [A$^{-1}$]')
